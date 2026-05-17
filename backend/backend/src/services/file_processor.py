@@ -40,18 +40,15 @@ async def validate_file(file: UploadFile, max_size: int = MAX_FILE_SIZE_BYTES) -
     
     return extension, file_size
 
+import tempfile
+
 async def save_upload_file(file: UploadFile, subfolder: str) -> Tuple[str, str]:
     """
-    Saves an uploaded file to the specified subfolder under 'uploads/'.
-    Returns (stored_filename, relative_path).
+    Saves an uploaded file temporarily to the specified subfolder.
+    Returns (stored_filename, absolute_path).
     """
-    # Root uploads directory is at the project root
-    # Based on the list_dir, we are in 'backend/backend' but 'uploads' is in project root.
-    # However, for simplicity and local dev, we can use a relative path.
-    # The 'uploads' folder was created in 'samvaad_sathi_backend' root.
-    
-    # Assuming CWD is samvaad_sathi_backend
-    upload_dir = pathlib.Path("uploads") / subfolder
+    # Use temporary directory instead of permanent uploads folder
+    upload_dir = pathlib.Path(tempfile.gettempdir()) / "samvaad_sathi_uploads" / subfolder
     upload_dir.mkdir(parents=True, exist_ok=True)
     
     extension = pathlib.Path(file.filename or "").suffix.lower()

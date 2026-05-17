@@ -104,6 +104,8 @@ async def delete_job_profile(
         raise fastapi.HTTPException(status_code=404, detail="Job Profile not found")
     return fastapi.Response(status_code=fastapi.status.HTTP_204_NO_CONTENT)
 
+from src.repository.crud.uploaded_file import UploadedFileCRUDRepository
+
 @router.post(
     path="/job-profiles/upload/job-description",
     name="job-profiles:upload-jd",
@@ -114,13 +116,24 @@ async def delete_job_profile(
 async def upload_job_description(
     file: UploadFile = File(..., description="PDF or DOC/DOCX file (max 10MB)"),
     current_user=fastapi.Depends(get_current_user),
+    uploaded_file_repo: UploadedFileCRUDRepository = fastapi.Depends(get_repository(repo_type=UploadedFileCRUDRepository)),
 ) -> JobProfileUploadResponse:
     extension, size = await validate_file(file)
     stored_name, path = await save_upload_file(file, "job-descriptions")
     
+    # Save persistent metadata to DB
+    await uploaded_file_repo.create_uploaded_file(
+        original_file_name=file.filename or "unknown",
+        stored_file_name=stored_name,
+        file_type=extension.replace(".", ""),
+        file_size=size,
+        file_path=path,
+        purpose="job-description"
+    )
+    
     return JobProfileUploadResponse(
         success=True,
-        originalFileName=file.filename,
+        originalFileName=file.filename or "",
         storedFileName=stored_name,
         fileType=extension.replace(".", ""),
         fileSize=size,
@@ -137,13 +150,24 @@ async def upload_job_description(
 async def upload_knowledge_questions(
     file: UploadFile = File(..., description="PDF or DOC/DOCX file (max 10MB)"),
     current_user=fastapi.Depends(get_current_user),
+    uploaded_file_repo: UploadedFileCRUDRepository = fastapi.Depends(get_repository(repo_type=UploadedFileCRUDRepository)),
 ) -> JobProfileUploadResponse:
     extension, size = await validate_file(file)
     stored_name, path = await save_upload_file(file, "knowledge-questions")
     
+    # Save persistent metadata to DB
+    await uploaded_file_repo.create_uploaded_file(
+        original_file_name=file.filename or "unknown",
+        stored_file_name=stored_name,
+        file_type=extension.replace(".", ""),
+        file_size=size,
+        file_path=path,
+        purpose="knowledge-questions"
+    )
+    
     return JobProfileUploadResponse(
         success=True,
-        originalFileName=file.filename,
+        originalFileName=file.filename or "",
         storedFileName=stored_name,
         fileType=extension.replace(".", ""),
         fileSize=size,
