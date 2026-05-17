@@ -9,3 +9,4 @@ from .summary_report import SummaryReport  # noqa: F401
 from .pacing_practice import PacingPracticeSession  # noqa: F401
 from .job_profile import JobProfile  # noqa: F401
 from .uploaded_file import UploadedFile  # noqa: F401
+from .analytics_event import AnalyticsEvent  # noqa: F401

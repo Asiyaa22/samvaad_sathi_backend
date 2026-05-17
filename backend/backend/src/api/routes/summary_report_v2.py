@@ -16,6 +16,7 @@ from src.repository.crud.interview import InterviewCRUDRepository
 from src.repository.crud.question import QuestionAttemptCRUDRepository
 from src.repository.crud.summary_report import SummaryReportCRUDRepository
 from src.services.summary_report_v2 import SummaryReportServiceV2
+from src.services.analytics_events import track_analytics_event
 
 
 router = fastapi.APIRouter(prefix="/v2", tags=["summary-report-v2"])
@@ -24,6 +25,7 @@ router = fastapi.APIRouter(prefix="/v2", tags=["summary-report-v2"])
 @router.post(
     "/summary-report",
     response_model=SummaryReportResponseLite,
+    response_model_exclude_none=True,
     status_code=200,
     summary="Generate a V2 summary report (Lite version)",
     description=(
@@ -80,6 +82,7 @@ async def generate_summary_report_v2(
 @router.get(
     "/summary-report/{interview_id}",
     response_model=SummaryReportResponseLite,
+    response_model_exclude_none=True,
     status_code=200,
     summary="Fetch a previously saved V2 summary report",
     description="Retrieves a persisted V2 Lite summary report for the interview if present.",
@@ -101,5 +104,13 @@ async def get_summary_report_v2(
     record = await sr_repo.get_by_interview_id(interview_id)
     if not record or not record.report_json:
         raise fastapi.HTTPException(status_code=404, detail="Summary report not found for this interview")
+
+    await track_analytics_event(
+        session,
+        event_type="report_viewed",
+        user_id=current_user.id,
+        interview_id=interview.id,
+        event_data={"report_type": "summary_v2", "source": "summary_report_v2.get_summary_report_v2"},
+    )
 
     return SummaryReportResponseLite(**record.report_json)

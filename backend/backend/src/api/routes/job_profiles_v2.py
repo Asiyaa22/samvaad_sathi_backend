@@ -6,7 +6,7 @@ from src.api.dependencies.repository import get_repository
 from src.models.schemas.job_profile import (
     JobProfileSummaryResponse, 
     JobProfileResponse, 
-    JobProfileCreate,
+    JobProfileCreateV2,
     JobProfileListResponse,
     JobProfileActivityResponse,
     JobProfileUploadResponse,
@@ -81,7 +81,7 @@ async def list_job_profiles(
     summary="Create a new Job Profile",
 )
 async def create_job_profile(
-    payload: JobProfileCreate,
+    payload: JobProfileCreateV2,
     current_user=fastapi.Depends(get_current_user),
     job_profile_repo: JobProfileCRUDRepository = fastapi.Depends(get_repository(repo_type=JobProfileCRUDRepository)),
 ) -> JobProfileResponse:
