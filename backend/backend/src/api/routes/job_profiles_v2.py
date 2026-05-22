@@ -88,21 +88,7 @@ async def create_job_profile(
     profile = await job_profile_repo.create_profile(title=payload.title, description=payload.description)
     return JobProfileResponse.from_orm(profile)
 
-@router.delete(
-    path="/job-profiles/{id}",
-    name="job-profiles:delete",
-    status_code=fastapi.status.HTTP_204_NO_CONTENT,
-    summary="Delete a Job Profile",
-)
-async def delete_job_profile(
-    id: int,
-    current_user=fastapi.Depends(get_current_user),
-    job_profile_repo: JobProfileCRUDRepository = fastapi.Depends(get_repository(repo_type=JobProfileCRUDRepository)),
-):
-    success = await job_profile_repo.delete_profile(profile_id=id)
-    if not success:
-        raise fastapi.HTTPException(status_code=404, detail="Job Profile not found")
-    return fastapi.Response(status_code=fastapi.status.HTTP_204_NO_CONTENT)
+
 
 @router.post(
     path="/job-profiles/upload/job-description",

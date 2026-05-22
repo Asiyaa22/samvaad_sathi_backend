@@ -104,19 +104,6 @@ async def create_job_profile(
     return JobProfileResponse.from_orm(profile)
 
 
-@_app.delete(
-    path="/api/v2/job-profiles/{id}",
-    status_code=204,
-)
-async def delete_job_profile(
-    id: int,
-    current_user=fastapi.Depends(_fake_current_user),
-    job_profile_repo: JobProfileCRUDRepository = fastapi.Depends(_get_mock_repo),
-):
-    success = await job_profile_repo.delete_profile(profile_id=id)
-    if not success:
-        raise fastapi.HTTPException(status_code=404, detail="Job Profile not found")
-    return fastapi.Response(status_code=fastapi.status.HTTP_204_NO_CONTENT)
 
 
 @_app.post(
@@ -282,22 +269,6 @@ def test_create_job_profile():
     _mock_repo.create_profile.assert_called_once_with(title="Frontend Engineer", description="Builds modern interfaces")
 
 
-# 5. DELETE /api/v2/job-profiles/{id}
-def test_delete_job_profile_success():
-    _mock_repo.delete_profile = AsyncMock(return_value=True)
-
-    response = client.delete("/api/v2/job-profiles/42")
-    assert response.status_code == 204
-    assert not response.content  # HTTP 204 has no body
-    _mock_repo.delete_profile.assert_called_once_with(profile_id=42)
-
-
-def test_delete_job_profile_not_found():
-    _mock_repo.delete_profile = AsyncMock(return_value=False)
-
-    response = client.delete("/api/v2/job-profiles/999")
-    assert response.status_code == 404
-    assert response.json()["detail"] == "Job Profile not found"
 
 
 # 6. POST /api/v2/job-profiles/upload/job-description

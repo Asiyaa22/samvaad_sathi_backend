@@ -99,10 +99,13 @@ async def initialize_db_connection(backend_app: fastapi.FastAPI) -> None:
 
     backend_app.state.db = async_db
 
-    async with backend_app.state.db.async_engine.begin() as connection:
-        await initialize_db_tables(connection=connection)
-
-    loguru.logger.info("Database Connection --- Successfully Established!")
+    try:
+        async with backend_app.state.db.async_engine.begin() as connection:
+            await initialize_db_tables(connection=connection)
+        loguru.logger.info("Database Connection --- Successfully Established!")
+    except Exception as e:
+        loguru.logger.error(f"Database connection failed: {e}")
+        loguru.logger.warning("Bypassing DB connection for offline/local development/Swagger review mode.")
 
 
 async def dispose_db_connection(backend_app: fastapi.FastAPI) -> None:
