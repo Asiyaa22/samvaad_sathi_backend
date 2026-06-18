@@ -3,9 +3,9 @@ from typing import List, Optional, Dict, Any
 
 class ScoreBreakdown(BaseModel):
     skillsMatch: int
-    experienceMatch: int
-    formattingScore: int
-    keywordDensity: int
+    experience: int
+    formatting: int
+    keywords: int
 
 class SkillsAnalysis(BaseModel):
     strongSkills: List[str]
