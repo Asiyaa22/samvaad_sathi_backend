@@ -66,7 +66,10 @@ class BackendBaseSettings(BaseSettings):
         "https://www.samvaad-sathi.barabaricollective.org",  # Production frontend (with www)
         "https://dev-backend-samvaadsathi.barabaricollective.org",  # Dev backend (for local frontend testing)
         "https://samvaad-dashboard.barabaricollective.org",
-        "https://master.d30wpikvvj1kc2.amplifyapp.com"
+        "https://master.d30wpikvvj1kc2.amplifyapp.com",
+        # staging
+        "https://samvaad-saathi-staging.barabaricollective.org",
+        "https://api-staging.barabaricollective.org",
     ]
     ALLOWED_METHODS: list[str] = ["*"]
     ALLOWED_HEADERS: list[str] = ["*"]
